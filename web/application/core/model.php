@@ -31,6 +31,18 @@ class Model
 				return self::$localEntityManager->find(get_called_class(), $id);
     }
 
+    // Поиск записи по полю
+		public static function find_by($field_name, $field_value)
+    {
+        $repository = self::$localEntityManager->getRepository(get_called_class());
+        $user_data = $repository->findBy(array($field_name => $field_value));
+        if (array_key_exists(0, $user_data)){
+          return $user_data[0];
+        } else {
+          return null;
+        }
+    }
+
     // сохранение отдельной записи
     public function save()
     {

@@ -9,27 +9,43 @@ use Doctrine\Common\Collections\ArrayCollection;
  */
 class User extends Model
 {
-    public function set_params($params = array())
+    public function __construct($params = array())
     {
-        parent::set_params($params);
-        $this->$crypted_password = md5($params["password"] . md5("salt"));
+        $this->username = $params['username'];
+        $this->crypted_password = md5($params['pass'] . md5('salt'));
+        $this->logintime = date('c');
     }
     /**
      * @ORM\Id
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue
    */
-    private $id;
+    protected $id;
     /**
      * @ORM\Column(type="string")
      */
-    private $username;
+    protected $username;
     /**
      * @ORM\Column(type="string")
      */
-    private $logintime;
+    protected $logintime;
     /**
      * @ORM\Column(type="string")
      */
-    private $crypted_password;
+    protected $crypted_password;
+
+    public function get_data()
+    {
+        return [ 'username' => $this->username, 'logintime' => $this->logintime ];
+    }
+
+    public function auth($pass)
+    {
+        $res = md5($pass . md5('salt')) == $this->crypted_password;
+        if ($res) {
+            $this->logintime = date('c');
+            $this->save();
+        }
+        return $res;
+    }
 }
